@@ -62,27 +62,43 @@ static int find_free_block(size_t size, mblock_t **previous, mblock_t **availabl
 	return (0);
 }
 
-static void split_block(mblock_t *first, size_t size)
+/*
+** Splits a memory block using some-kind of katana
+** Takes:
+** 	- a pointer to the block being splited ;
+** 	- the size to keep on the first block.
+** Uses:
+**	- split a block to the size requested by the user if it is too large.
+*/
+static void split_block(mblock_t *to_split, size_t size)
 {
-	mblock_t	*sub = first + size;
+	mblock_t	*sub = to_split + size;
 
-	sub->previous = first;
-	sub->next = first->next;
-	sub->size = first->size - size;
+	sub->previous = to_split;
+	sub->next = to_split->next;
+	sub->size = to_split->size - size;
 	sub->isFree = TRUE;
 	sub->contents = sub + 1;
-	if (first->next != NULL)
-		first->next->previous = sub;
-	first->next = sub;
-	first->size = size - sizeof(mblock_t);
+	if (to_split->next != NULL)
+		to_split->next->previous = sub;
+	to_split->next = sub;
+	to_split->size = size - sizeof(mblock_t);
 }
 
-static void merge_blocks(mblock_t *merged)
+/*
+** Merges two blocks using some kind of powerfull welder
+** Takes:
+** 	- a pointer to the first block of the two being merged.
+** Uses:
+** 	- merge to blocks that are free in order to facilitate re-allocation
+** 		or memory release.
+*/
+static void merge_blocks(mblock_t *to_split)
 {
-	merged->size += merged->next->size + sizeof(mblock_t);
-	merged->next = merged->next->next;
-	if (merged->next != NULL)
-		merged->next->previous = merged;
+	to_split->size += to_split->next->size + sizeof(mblock_t);
+	to_split->next = to_split->next->next;
+	if (to_split->next != NULL)
+		to_split->next->previous = to_split;
 }
 
 /*
@@ -118,7 +134,7 @@ void *malloc(size_t size)
 
 void free(void *ptr)
 {
-	mblock_t *toFree;
+	mblock_t *to_free;
 
 	write(2, "Freeing is futile\n", 19);
 	if (!ptr)
@@ -127,18 +143,18 @@ void free(void *ptr)
 		write(2, "err 2", 6);
 	// if (ptr > sbrk(0))
 	// 	write(2, "err 3", 6);
-	toFree = (mblock_t *) ptr - 1;
+	to_free = (mblock_t *) ptr - 1;
 
-	if (toFree->next != NULL && toFree->next->isFree == TRUE)
-		merge_blocks(toFree);
-	if (toFree->previous->isFree == TRUE) {
-		toFree = toFree->previous;
-		merge_blocks(toFree);
+	if (to_free->next != NULL && to_free->next->isFree == TRUE)
+		merge_blocks(to_free);
+	if (to_free->previous->isFree == TRUE) {
+		to_free = to_free->previous;
+		merge_blocks(to_free);
 	}
-	if (!toFree->next) {
-		toFree->previous->next = NULL;
-		sbrk(- toFree->size - sizeof(mblock_t));
+	if (!to_free->next) {
+		to_free->previous->next = NULL;
+		sbrk(- to_free->size - sizeof(mblock_t));
 	}
-	toFree->isFree = TRUE;
+	to_free->isFree = TRUE;
 	write(2, "kappa\n", 7);
 }
