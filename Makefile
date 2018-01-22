@@ -13,7 +13,7 @@ NAME_TEST	=	test.out
 
 RM		=	rm -vf
 
-SRCS		=	tests/test.c
+SRCS		=	src/my_malloc.c
 
 SRCS_TEST	=	main.c
 
@@ -21,7 +21,7 @@ OBJS		=	$(SRCS:.c=.o)
 
 OBJS_TEST	=	$(SRCS_TEST:.c=.o)
 
-CFLAGS		=	-W -Wextra -Wall
+CFLAGS		=	-W -Wextra -Wall -Iinclude/
 
 all: $(NAME)
 
