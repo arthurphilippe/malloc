@@ -54,7 +54,7 @@ static int find_free_block(size_t size, mblock_t **previous, mblock_t **availabl
 
 	if (head == (void *) -1)
 		return (-1);
-	while (head && (head->isFree || head->size  < size)) {
+	while (head && (!head->isFree || head->size < size)) {
 		*previous = head;
 		head = head->next;
 	}
@@ -111,7 +111,7 @@ void *malloc(size_t size)
 	mblock_t	*available;
 	size_t		aligned_size = align_size(size);
 
-	write(2, "malloc was called\n", 19);
+	write(1, "malloc was called\n", 19);
 	if (!size || find_free_block(size, &previous, &available) != 0)
 		return (NULL);
 	if (!available) {
@@ -124,10 +124,12 @@ void *malloc(size_t size)
 		available->isFree = FALSE;
 		available->contents = available + 1;
 		previous->next = available;
+		write(1, " --> alocated a block\n", 23);
 	}
 	else if (aligned_size + sizeof(size_t) < available->size) {
 		split_block(available, aligned_size);
 		available->isFree = FALSE;
+		write(1, " --> found an empty block\n", 27);
 	}
 	return (available->contents);
 }
@@ -136,11 +138,13 @@ void free(void *ptr)
 {
 	mblock_t *to_free;
 
-	write(2, "Freeing is futile\n", 19);
+	write(2, "free called\n", 19);
 	if (!ptr)
 		return;
-	if (ptr < get_heap_head())
-		write(2, "err 2", 6);
+	if (get_heap_head() && ptr < get_heap_head()) {
+		write(2, "err 2\n", 7);
+		return;
+	}
 	// if (ptr > sbrk(0))
 	// 	write(2, "err 3", 6);
 	to_free = (mblock_t *) ptr - 1;
@@ -151,10 +155,15 @@ void free(void *ptr)
 		to_free = to_free->previous;
 		merge_blocks(to_free);
 	}
+	to_free->isFree = TRUE;
 	if (!to_free->next) {
 		to_free->previous->next = NULL;
 		sbrk(- to_free->size - sizeof(mblock_t));
 	}
-	to_free->isFree = TRUE;
-	write(2, "kappa\n", 7);
+	write(2, " --> free finished\n", 20);
+}
+
+void *realloc(void *ptr , size_t size)
+{
+	write(2, "rea-what?\n", 11);
 }

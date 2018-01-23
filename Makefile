@@ -15,7 +15,7 @@ RM		=	rm -vf
 
 SRCS		=	src/my_malloc.c
 
-SRCS_TEST	=	main.c
+SRCS_TEST	=	tests/main.c
 
 OBJS		=	$(SRCS:.c=.o)
 
