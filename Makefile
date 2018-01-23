@@ -39,10 +39,10 @@ $(NAME): $(OBJS)
 	$(CC) $(OBJS) -shared -fPIC -o $(NAME)
 
 clean:
-	$(RM) $(OBJS) $(OBJS_TEST)
+	@$(RM) $(OBJS) $(OBJS_TEST)
 
 fclean: clean
-	$(RM) $(NAME) $(NAME_TEST)
+	@$(RM) $(NAME) $(NAME_TEST)
 
 re: fclean all
 

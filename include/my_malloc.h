@@ -10,6 +10,7 @@
 
 	#include <unistd.h>
 
+const size_t ALIGNMENT = sizeof(void *);
 
 enum boolean {
 	FALSE = 0,
@@ -20,7 +21,7 @@ typedef struct		s_mblock {
 	struct s_mblock	*previous;
 	struct s_mblock	*next;
 	size_t		size;
-	enum boolean	isFree;
+	enum boolean	is_free;
 	void		*contents;
 }			mblock_t;
 
