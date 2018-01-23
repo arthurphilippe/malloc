@@ -140,6 +140,27 @@ void *malloc(size_t size)
 	return (available->contents);
 }
 
+/*
+** WIP : supose to compute how much to free when a page has been liberated
+*/
+static void free_out_of_page(mblock_t *to_free, mblock_t *heap)
+{
+	size_t page_size = getpagesize();
+	size_t current_page_pos = page_size * (size_t) to_free / page_size;
+	size_t diff;
+
+	to_free->previous->next = NULL;
+	if ((to_free->size + ((size_t) to_free)) > page_size) {
+		diff = (size_t) ((to_free + to_free->size) - heap)
+			- current_page_pos;
+		to_free->size = (size_t) to_free->size - diff;
+		sbrk(-diff);
+	}
+}
+
+/*
+** The almight free function.
+*/
 void free(void *ptr)
 {
 	mblock_t *to_free;
@@ -162,10 +183,8 @@ void free(void *ptr)
 		merge_blocks(to_free);
 	}
 	to_free->is_free = TRUE;
-	if (!to_free->next) {
-		to_free->previous->next = NULL;
-		// sbrk(- (to_free->size - sizeof(mblock_t)));
-	}
+	if (!to_free->next)
+		free_out_of_page(to_free, get_heap_head());
 	write(2, " --> free finished\n", 20);
 }
 
