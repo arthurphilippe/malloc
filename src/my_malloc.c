@@ -21,6 +21,9 @@ static size_t align_size(size_t size)
 ** returns :
 ** 	on success: the heap's head ;
 ** 	on failure: (void *) -1.
+**
+** 	TODO: upon heap creation, use getpagesize
+**
 */
 static void *get_heap_head()
 {
