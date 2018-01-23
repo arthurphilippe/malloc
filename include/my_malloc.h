@@ -5,8 +5,8 @@
 ** header
 */
 
-#ifndef MALLOC_H_
-	#define MALLOC_H_
+#ifndef MY_MALLOC_H_
+	#define MY_MALLOC_H_
 
 	#include <unistd.h>
 
@@ -25,4 +25,4 @@ typedef struct		s_mblock {
 	void		*contents;
 }			mblock_t;
 
-#endif /* !MALLOC_H_ */
+#endif /* !MY_MALLOC_H_ */

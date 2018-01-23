@@ -30,12 +30,12 @@ static void *get_heap_head()
 	static mblock_t	*head = NULL;
 
 	if (!head) {
-		head = sbrk(align_size(sizeof(mblock_t)));
+		head = sbrk(getpagesize());
 		if (head == (void *) -1)
 			return (head);
 		head->previous = NULL;
 		head->next = NULL;
-		head->size = 0;
+		head->size = getpagesize() - sizeof(mblock_t);
 		head->is_free = FALSE;
 		head->contents = NULL;
 	}
@@ -164,7 +164,7 @@ void free(void *ptr)
 	to_free->is_free = TRUE;
 	if (!to_free->next) {
 		to_free->previous->next = NULL;
-		sbrk(- (to_free->size - sizeof(mblock_t)));
+		// sbrk(- (to_free->size - sizeof(mblock_t)));
 	}
 	write(2, " --> free finished\n", 20);
 }
@@ -174,5 +174,13 @@ void *realloc(void *ptr , size_t size)
 	(void) ptr;
 	(void) size;
 	write(2, "rea-what?\n", 11);
+	return (NULL);
+}
+
+void *calloc(size_t nmemb, size_t size)
+{
+	(void) nmemb;
+	(void) size;
+	write(2, "ca-what?\n", 11);
 	return (NULL);
 }
