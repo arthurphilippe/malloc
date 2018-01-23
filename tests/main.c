@@ -16,6 +16,8 @@ int main(void)
 {
 	char *kappa = malloc(15);
 
+	void *breaksize =sbrk(0);
+
 	kappa[0] = '1';
 	kappa[2] = '3';
 	kappa[1] = '2';
@@ -41,4 +43,36 @@ int main(void)
 	write(1, "\n", 1);
 	free(badabou);
 	free(kappa);
+
+	char *zoum = malloc(300);
+
+	int i = 0;
+	while (i < 300) {
+		zoum[i] = 'z';
+		i+= 1;
+	}
+	write(1, zoum, 300);
+
+	char *bsartek = malloc(6000);
+
+	i = 0;
+	while (i < 6000) {
+		bsartek[i] = 'z';
+		i+= 1;
+	}
+	write(1, bsartek, 6000);
+
+	free(zoum);
+	free(bsartek);
+	breaksize =sbrk(0);
+	bsartek = malloc(1120000);
+
+	i = 0;
+	while (i < 1120000) {
+		bsartek[i] = 'z';
+		i+= 1;
+	}
+	// write(1, bsartek, 1120000);
+
+	free(bsartek);
 }
