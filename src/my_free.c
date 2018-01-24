@@ -33,9 +33,7 @@ void free(void *ptr)
 {
 	mblock_t *to_free;
 
-	if (!ptr)
-		return;
-	if (get_heap_head() == (void *) -1 || ptr < get_heap_head()) {
+	if (!ptr || get_heap_head() == (void *) -1 || ptr < get_heap_head()) {
 		write(2, "no heap or ptr under heap\n", 27);
 		return;
 	}

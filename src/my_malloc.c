@@ -11,7 +11,7 @@
 /*
 ** Keeps track of the heap's head and allocates it on first call.
 ** returns :
-** 	on success: the heap's head ;
+** 	on success: the heap's head;
 ** 	on failure: (void *) -1.
 **
 ** 	TODO: upon heap creation, use getpagesize
@@ -37,11 +37,11 @@ void *get_heap_head()
 /*
 ** Finds a free block of adequate size.
 ** Takes:
-** 	- a block size to match ;
+** 	- a block size to match;
 ** 	- a double pointer to a block : will be filled with
-** 		the address of the block prior to the free one ;
+** 		the address of the block prior to the free one;
 ** 	- a double pointer to a block : will be filled with
-** 		the address of the soon-to-be found free block ;
+** 		the address of the soon-to-be found free block;
 ** returns on error: -1 (otherwise 0)
 */
 inline static int find_free_block(size_t size, mblock_t **previous, mblock_t **available)
@@ -56,6 +56,46 @@ inline static int find_free_block(size_t size, mblock_t **previous, mblock_t **a
 	}
 	*available = head;
 	return (0);
+}
+
+static size_t get_pages_to_alloc(mblock_t *previous, size_t size)
+{
+	size_t zeroed_prev = (size_t) previous
+		- (size_t) get_heap_head();
+	size_t pages_requiered;
+	size_t pages_allocated;
+	size_t page_size = getpagesize();
+
+	pages_requiered = zeroed_prev + size;
+	pages_requiered /= page_size;
+	pages_requiered += 1;
+	pages_allocated = zeroed_prev / page_size;
+	return ((pages_requiered - pages_allocated) * page_size);
+}
+
+/*
+** Pushes back the page break.
+** takes:
+** 	- the last block of the heap;
+** 	- the size requiered to fit the new block.
+** returns:
+** 	on success: a block ready to used;
+** 	on failure: a NULL pointer.
+*/
+static void *push_back_pagebrk(mblock_t *previous, size_t size)
+{
+	mblock_t *available;
+	size_t size_to_alloc = get_pages_to_alloc(previous, size);
+
+	available = sbrk(size_to_alloc);
+	if (available == (void *) - 1)
+		return (NULL);
+	available->previous = previous;
+	available->next = NULL;
+	available->size = size_to_alloc - sizeof(mblock_t);
+	available->contents = available + 1;
+	previous->next = available;
+	return (available);
 }
 
 /*
@@ -73,17 +113,12 @@ void *malloc(size_t size)
 			&previous, &available) != 0)
 		return (NULL);
 	if (!available) {
-		available = sbrk(aligned_size);
-		if (available == (void *) - 1)
+		available = push_back_pagebrk(previous, aligned_size);
+		if (available == NULL)
 			return (NULL);
-		available->previous = previous;
-		available->next = NULL;
-		available->size = aligned_size - sizeof(mblock_t);
-		available->contents = available + 1;
-		previous->next = available;
 		// write(2, " --> alocated a block\n", 23);
 	}
-	else if (aligned_size + sizeof(ALIGNMENT) < available->size) {
+	if (aligned_size + sizeof(ALIGNMENT) < available->size) {
 		split_block(available, aligned_size);
 		// write(2, " --> found an empty block\n", 27);
 	}
