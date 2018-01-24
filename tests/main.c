@@ -95,6 +95,10 @@ int main(void)
 	write(1, kappa, 8);
 	write(1, "\n", 1);
 	kappa = realloc(kappa, 3);
+	write(1, "\n", 1);
+	write(1, kappa, 3);
+	write(1, "\n", 1);
+	write(1, "\n", 1);
 	kappa[0] = '1';
 	kappa[2] = '3';
 	kappa[1] = '2';

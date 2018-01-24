@@ -17,7 +17,7 @@
 */
 void split_block(mblock_t *to_split, size_t size)
 {
-	mblock_t	*sub = to_split + size;
+	mblock_t	*sub = (mblock_t *) ((void *) to_split + size);
 
 	sub->previous = to_split;
 	sub->next = to_split->next;

@@ -28,8 +28,8 @@ void *get_heap_head()
 		head->previous = NULL;
 		head->next = NULL;
 		head->size = getpagesize() - sizeof(mblock_t);
-		head->is_free = FALSE;
-		head->contents = NULL;
+		head->is_free = TRUE;
+		head->contents = head + 1;
 	}
 	return (head);
 }
