@@ -6,16 +6,7 @@
 */
 
 #include "my_malloc.h"
-
-const size_t ALIGNMENT = sizeof(void *);
-
-/*
-** Returns an memory aligned size.
-*/
-static size_t align_size(size_t size)
-{
-	return ((size + ALIGNMENT - 1) & ~(ALIGNMENT - 1));
-}
+#include "alignment.h"
 
 /*
 ** Keeps track of the heap's head and allocates it on first call.
@@ -53,7 +44,7 @@ void *get_heap_head()
 ** 		the address of the soon-to-be found free block ;
 ** returns on error: -1 (otherwise 0)
 */
-static int find_free_block(size_t size, mblock_t **previous, mblock_t **available)
+inline static int find_free_block(size_t size, mblock_t **previous, mblock_t **available)
 {
 	mblock_t *head = get_heap_head();
 
@@ -65,45 +56,6 @@ static int find_free_block(size_t size, mblock_t **previous, mblock_t **availabl
 	}
 	*available = head;
 	return (0);
-}
-
-/*
-** Splits a memory block using some-kind of katana
-** Takes:
-** 	- a pointer to the block being splited ;
-** 	- the size to keep on the first block.
-** Uses:
-**	- split a block to the size requested by the user if it is too large.
-*/
-static void split_block(mblock_t *to_split, size_t size)
-{
-	mblock_t	*sub = to_split + size;
-
-	sub->previous = to_split;
-	sub->next = to_split->next;
-	sub->size = to_split->size - size;
-	sub->is_free = TRUE;
-	sub->contents = sub + 1;
-	if (to_split->next != NULL)
-		to_split->next->previous = sub;
-	to_split->next = sub;
-	to_split->size = size - sizeof(mblock_t);
-}
-
-/*
-** Merges two blocks using some kind of powerfull welder
-** Takes:
-** 	- a pointer to the first block of the two being merged.
-** Uses:
-** 	- merge to blocks that are free in order to facilitate re-allocation
-** 		or memory release.
-*/
-void merge_blocks(mblock_t *to_split)
-{
-	to_split->size += to_split->next->size + sizeof(mblock_t);
-	to_split->next = to_split->next->next;
-	if (to_split->next != NULL)
-		to_split->next->previous = to_split;
 }
 
 /*
@@ -137,29 +89,4 @@ void *malloc(size_t size)
 	}
 	available->is_free = FALSE;
 	return (available->contents);
-}
-
-void *realloc(void *ptr, size_t size)
-{
-	char		*n_ptr;
-	mblock_t	*old = ptr - 1;
-	char		*old_arr = ptr;
-
-	if (!ptr || !(n_ptr = malloc(size)))
-		return (NULL);
-	for (size_t i = 0; i < old->size ; ++i)
-		n_ptr[i] = (char) old_arr[i];
-	free(ptr);
-	return (n_ptr);
-}
-
-void *calloc(size_t nmemb, size_t size)
-{
-	char	*ptr = malloc(nmemb * size);
-
-	if (!ptr)
-		return (ptr);
-	for (size_t i = 0; i < (nmemb * size) ; ++i)
-		ptr[i] = 0;
-	return (ptr);
 }

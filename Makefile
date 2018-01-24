@@ -14,7 +14,10 @@ NAME_TEST	=	test.out
 RM		=	rm -vf
 
 SRCS		=	src/my_malloc.c		\
-			src/my_free.c
+			src/my_free.c		\
+			src/blocks.c		\
+			src/realloc.c		\
+			src/calloc.c
 
 SRCS_TEST	=	tests/main.c
 

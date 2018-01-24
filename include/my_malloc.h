@@ -23,8 +23,10 @@ typedef struct		s_mblock {
 	void		*contents;
 }			mblock_t;
 
+void *malloc(size_t);
 void free(void *ptr);
 void *get_heap_head();
-void merge_blocks(mblock_t *to_split);
+void merge_blocks(mblock_t *to_merge);
+void split_block(mblock_t *to_split, size_t size);
 
 #endif /* !MY_MALLOC_H_ */
