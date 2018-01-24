@@ -10,8 +10,6 @@
 
 	#include <unistd.h>
 
-const size_t ALIGNMENT = sizeof(void *);
-
 enum boolean {
 	FALSE = 0,
 	TRUE = 1
@@ -24,5 +22,9 @@ typedef struct		s_mblock {
 	enum boolean	is_free;
 	void		*contents;
 }			mblock_t;
+
+void free(void *ptr);
+void *get_heap_head();
+void merge_blocks(mblock_t *to_split);
 
 #endif /* !MY_MALLOC_H_ */

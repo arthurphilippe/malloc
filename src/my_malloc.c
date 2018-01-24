@@ -7,13 +7,14 @@
 
 #include "my_malloc.h"
 
+const size_t ALIGNMENT = sizeof(void *);
+
 /*
 ** Returns an memory aligned size.
 */
 static size_t align_size(size_t size)
 {
-	return (size + ALIGNMENT - 1) & ~(ALIGNMENT - 1);
-	// return (size + (sizeof(size_t) - 1)) & ~(sizeof(size_t) - 1);
+	return ((size + ALIGNMENT - 1) & ~(ALIGNMENT - 1));
 }
 
 /*
@@ -25,7 +26,7 @@ static size_t align_size(size_t size)
 ** 	TODO: upon heap creation, use getpagesize
 **
 */
-static void *get_heap_head()
+void *get_heap_head()
 {
 	static mblock_t	*head = NULL;
 
@@ -97,7 +98,7 @@ static void split_block(mblock_t *to_split, size_t size)
 ** 	- merge to blocks that are free in order to facilitate re-allocation
 ** 		or memory release.
 */
-static void merge_blocks(mblock_t *to_split)
+void merge_blocks(mblock_t *to_split)
 {
 	to_split->size += to_split->next->size + sizeof(mblock_t);
 	to_split->next = to_split->next->next;
@@ -115,8 +116,8 @@ void *malloc(size_t size)
 	mblock_t	*available;
 	size_t		aligned_size = align_size(size + sizeof(mblock_t));
 
-	write(2, "malloc was called\n", 19);
-	if (!size || find_free_block(size + sizeof(size_t),
+	// write(2, "malloc was called\n", 19);
+	if (!size || find_free_block(size + sizeof(ALIGNMENT),
 			&previous, &available) != 0)
 		return (NULL);
 	if (!available) {
@@ -126,81 +127,39 @@ void *malloc(size_t size)
 		available->previous = previous;
 		available->next = NULL;
 		available->size = aligned_size - sizeof(mblock_t);
-		available->is_free = FALSE;
 		available->contents = available + 1;
 		previous->next = available;
-		write(2, " --> alocated a block\n", 23);
+		// write(2, " --> alocated a block\n", 23);
 	}
-	else if (aligned_size + sizeof(size_t) < available->size) {
+	else if (aligned_size + sizeof(ALIGNMENT) < available->size) {
 		split_block(available, aligned_size);
-		available->is_free = FALSE;
-		write(2, " --> found an empty block\n", 27);
+		// write(2, " --> found an empty block\n", 27);
 	}
-	else
-		write(2, "WTF\n", 4);
+	available->is_free = FALSE;
 	return (available->contents);
 }
 
-/*
-** WIP : supose to compute how much to free when a page has been liberated
-*/
-static void free_out_of_page(mblock_t *to_free, mblock_t *heap)
+void *realloc(void *ptr, size_t size)
 {
-	size_t page_size = getpagesize();
-	size_t current_page_pos = ((size_t) to_free - (size_t) heap) * page_size;
-	size_t diff;
+	char		*n_ptr;
+	mblock_t	*old = ptr - 1;
+	char		*old_arr = ptr;
 
-	to_free->previous->next = NULL;
-	if ((to_free->size + ((size_t) to_free)) > page_size) {
-		diff = (size_t) ((to_free + to_free->size) - heap)
-			- current_page_pos;
-		to_free->size = (size_t) to_free->size - diff;
-		sbrk(-diff);
-	}
-}
-
-/*
-** The almight free function.
-*/
-void free(void *ptr)
-{
-	mblock_t *to_free;
-
-	write(2, "free called\n", 13);
-	if (!ptr)
-		return;
-	if (get_heap_head() == (void *) -1 || ptr < get_heap_head()) {
-		write(2, "no heap or ptr under heap\n", 27);
-		return;
-	}
-	// if (ptr > sbrk(0))
-	// 	write(2, "err 3", 6);
-	to_free = (mblock_t *) ptr - 1;
-
-	if (to_free->next != NULL && to_free->next->is_free == TRUE)
-		merge_blocks(to_free);
-	if (to_free->previous->is_free == TRUE) {
-		to_free = to_free->previous;
-		merge_blocks(to_free);
-	}
-	to_free->is_free = TRUE;
-	if (!to_free->next)
-		free_out_of_page(to_free, get_heap_head());
-	write(2, " --> free finished\n", 20);
-}
-
-void *realloc(void *ptr , size_t size)
-{
-	(void) ptr;
-	(void) size;
-	write(2, "rea-what?\n", 11);
-	return (NULL);
+	if (!ptr || !(n_ptr = malloc(size)))
+		return (NULL);
+	for (size_t i = 0; i < old->size ; ++i)
+		n_ptr[i] = (char) old_arr[i];
+	free(ptr);
+	return (n_ptr);
 }
 
 void *calloc(size_t nmemb, size_t size)
 {
-	(void) nmemb;
-	(void) size;
-	write(2, "ca-what?\n", 11);
-	return (NULL);
+	char	*ptr = malloc(nmemb * size);
+
+	if (!ptr)
+		return (ptr);
+	for (size_t i = 0; i < (nmemb * size) ; ++i)
+		ptr[i] = 0;
+	return (ptr);
 }

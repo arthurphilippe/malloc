@@ -64,6 +64,13 @@ int main(void)
 	free(zoum);
 	free(bsartek);
 	bsartek = malloc(1120000);
+	bsartek = malloc(1120000);
+	char *foo1 = malloc(1120003);
+	char *foo2 = malloc(11200);
+	char *foo3 = calloc(11207650, 1);
+	free(foo1);
+	free(foo3);
+	free(foo2);
 
 	i = 0;
 	while (i < 1120000) {
@@ -87,6 +94,13 @@ int main(void)
 	kappa[7] = 0;
 	write(1, kappa, 8);
 	write(1, "\n", 1);
+	kappa = realloc(kappa, 3);
+	kappa[0] = '1';
+	kappa[2] = '3';
+	kappa[1] = '2';
+	write(1, kappa, 3);
 	free(kappa);
 
+	kappa = calloc(12, 1);
+	free(kappa);
 }

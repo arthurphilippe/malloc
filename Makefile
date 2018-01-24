@@ -13,7 +13,8 @@ NAME_TEST	=	test.out
 
 RM		=	rm -vf
 
-SRCS		=	src/my_malloc.c
+SRCS		=	src/my_malloc.c		\
+			src/my_free.c
 
 SRCS_TEST	=	tests/main.c
 
@@ -36,7 +37,7 @@ $(NAME_TEST): $(OBJS_TEST)
 	$(CC) $(OBJS_TEST) -o $(NAME_TEST) -L. -lmy_malloc
 
 $(NAME): $(OBJS)
-	$(CC) $(OBJS) -shared -o $(NAME)
+	$(CC) -shared -o $(NAME) $(OBJS)
 
 clean:
 	@$(RM) $(OBJS) $(OBJS_TEST)
