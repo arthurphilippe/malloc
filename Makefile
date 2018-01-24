@@ -21,7 +21,7 @@ OBJS		=	$(SRCS:.c=.o)
 
 OBJS_TEST	=	$(SRCS_TEST:.c=.o)
 
-CFLAGS		=	-W -Wextra -Wall -Iinclude/
+CFLAGS		=	-W -Wextra -Wall -Iinclude/ -fPIC
 
 all: $(NAME)
 
@@ -36,7 +36,7 @@ $(NAME_TEST): $(OBJS_TEST)
 	$(CC) $(OBJS_TEST) -o $(NAME_TEST) -L. -lmy_malloc
 
 $(NAME): $(OBJS)
-	$(CC) $(OBJS) -shared -fPIC -o $(NAME)
+	$(CC) $(OBJS) -shared -o $(NAME)
 
 clean:
 	@$(RM) $(OBJS) $(OBJS_TEST)
