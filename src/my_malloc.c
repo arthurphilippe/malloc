@@ -116,7 +116,8 @@ void *malloc(size_t size)
 	size_t		aligned_size = align_size(size + sizeof(mblock_t));
 
 	write(2, "malloc was called\n", 19);
-	if (!size || find_free_block(size, &previous, &available) != 0)
+	if (!size || find_free_block(size + sizeof(size_t),
+			&previous, &available) != 0)
 		return (NULL);
 	if (!available) {
 		available = sbrk(aligned_size);
@@ -146,7 +147,7 @@ void *malloc(size_t size)
 static void free_out_of_page(mblock_t *to_free, mblock_t *heap)
 {
 	size_t page_size = getpagesize();
-	size_t current_page_pos = page_size * (size_t) to_free / page_size;
+	size_t current_page_pos = ((size_t) to_free - (size_t) heap) * page_size;
 	size_t diff;
 
 	to_free->previous->next = NULL;
