@@ -29,12 +29,9 @@ CFLAGS		=	-W -Wextra -Wall -Iinclude/ -fPIC
 
 all: $(NAME)
 
+debug: fclean
 debug: CFLAGS += -ggdb
 debug: $(NAME) $(NAME_TEST)
-
-debugre: CFLAGS += -ggdb
-debugre: fclean
-debugre: $(NAME) $(NAME_TEST)
 
 $(NAME_TEST): $(OBJS_TEST)
 	$(CC) $(OBJS_TEST) -o $(NAME_TEST) -L. -lmy_malloc
