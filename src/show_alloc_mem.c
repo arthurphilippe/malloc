@@ -20,7 +20,7 @@ void show_block(mblock_t *to_show, enum boolean all)
 		to_show->size);
 }
 
-void show_alloc_mem()
+void show_alloc_mem(void)
 {
 	mblock_t *in_heap = get_heap_head();
 
@@ -34,11 +34,11 @@ void show_alloc_mem()
 	}
 }
 
-void show_all_alloc_mem()
+void show_all_alloc_mem(void)
 {
 	mblock_t *in_heap = get_heap_head();
 
-	dprintf(1, "break : %p\n", sbrk(0));
+	dprintf(1, "---------------\nbreak : %p\n", sbrk(0));
 	if (!in_heap)
 		return;
 	while (in_heap) {

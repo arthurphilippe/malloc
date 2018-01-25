@@ -61,7 +61,7 @@ inline static int find_free_block(size_t size, mblock_t **previous, mblock_t **a
 	return (0);
 }
 
-static size_t get_pages_to_alloc(mblock_t *previous, size_t size)
+inline static size_t get_pages_to_alloc(mblock_t *previous, size_t size)
 {
 	size_t zeroed_prev = (size_t) previous
 		- (size_t) get_heap_head();
@@ -72,8 +72,10 @@ static size_t get_pages_to_alloc(mblock_t *previous, size_t size)
 	pages_requiered = zeroed_prev + size;
 	pages_requiered /= page_size;
 	pages_requiered += 1;
-	pages_allocated = zeroed_prev / page_size;
+	pages_allocated = (zeroed_prev / page_size); // <-- + 1 or not + 1 ?
+	// if (previous)
 	return ((pages_requiered - pages_allocated) * page_size);
+	// return (page_size * pages_requiered);
 }
 
 /*
@@ -100,6 +102,10 @@ static void *push_back_pagebrk(mblock_t *previous, size_t size)
 	available->size = size_to_alloc - sizeof(mblock_t);
 	available->contents = available + 1;
 	previous->next = available;
+	if (previous->is_free == TRUE) {
+		available = previous;
+		merge_blocks(available);
+	}
 	return (available);
 }
 

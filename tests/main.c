@@ -11,6 +11,8 @@
 
 void *malloc(size_t size);
 void free(void *ptr);
+void show_alloc_mem(void);
+void show_all_alloc_mem(void);
 
 int main(void)
 {
@@ -18,8 +20,11 @@ int main(void)
 	write(1, "\n", 1);
 	write(1, "\n", 1);
 
-	char *kappa = malloc(15);
-
+	char *kappa = malloc(4090);
+	show_all_alloc_mem();
+	free(kappa);
+	show_all_alloc_mem();
+	return (0);
 
 	kappa[0] = '1';
 	kappa[2] = '3';
@@ -44,18 +49,16 @@ int main(void)
 	badabou[7] = 0;
 	write(1, badabou, 8);
 	write(1, "\n", 1);
-	free(badabou);
+	// free(badabou);
 	free(kappa);
 
-	char *zoum = malloc(300);
+	badabou = realloc(badabou, 300);
 
 	int i = 0;
 	while (i < 300) {
-		zoum[i] = 'z';
+		badabou[i] = 'z';
 		i+= 1;
 	}
-	write(1, zoum, 300);
-
 	char *bsartek = malloc(6000);
 
 	i = 0;
@@ -63,27 +66,25 @@ int main(void)
 		bsartek[i] = 'z';
 		i+= 1;
 	}
-	write(1, bsartek, 6000);
 
-	free(zoum);
+	free(badabou);
 	free(bsartek);
+	bsartek = realloc(bsartek, 1120000);
 	bsartek = malloc(1120000);
-	free(bsartek);
-	bsartek = malloc(1120000);
-	char *foo1 = malloc(1120003);
+	char *foo1 = realloc(NULL, 1120003);
 	char *foo2 = malloc(11200);
 	char *foo3 = calloc(11207650, 1);
 	show_all_alloc_mem();
 	free(foo1);
 	free(foo3);
 	free(foo2);
+	show_all_alloc_mem();
 
 	i = 0;
 	while (i < 1120000) {
 		bsartek[i] = 'z';
 		i+= 1;
 	}
-	// write(1, bsartek, 1120000);
 
 	free(bsartek);
 
@@ -114,5 +115,4 @@ int main(void)
 	kappa = calloc(12, 1);
 	free(kappa);
 	show_all_alloc_mem();
-
 }

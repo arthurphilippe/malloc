@@ -26,7 +26,7 @@ static void free_out_of_page(mblock_t *to_free, mblock_t *heap)
 		diff = (((size_t) to_free->contents + to_free->size) - (size_t) heap)
 			- current_page_pos;
 		to_free->size = (size_t) to_free->size - diff;
-		sbrk(-diff);
+		sbrk(-(diff));
 	}
 }
 
@@ -43,6 +43,9 @@ void free(void *ptr)
 	}
 	pthread_mutex_lock(&g_malloc_lock);
 	to_free = (mblock_t *) ptr - 1;
+	if (to_free->is_free == TRUE) {
+		return;
+	}
 	if (to_free->next != NULL && to_free->next->is_free == TRUE)
 		merge_blocks(to_free);
 	if (to_free->previous && to_free->previous->is_free == TRUE) {
