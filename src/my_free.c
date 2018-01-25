@@ -6,9 +6,12 @@
 */
 
 #include "my_malloc.h"
+#include "pthread_lock.h"
+
+pthread_mutex_t g_malloc_lock;
 
 /*
-** WIP : supose to compute how much to free when a page has been liberated
+** Computes how much to free when a page has been emptied
 */
 static void free_out_of_page(mblock_t *to_free, mblock_t *heap)
 {
@@ -37,6 +40,7 @@ void free(void *ptr)
 		// write(2, "no heap or ptr under heap\n", 27);
 		return;
 	}
+	pthread_mutex_lock(&g_malloc_lock);
 	to_free = (mblock_t *) ptr - 1;
 	if (to_free->next != NULL && to_free->next->is_free == TRUE)
 		merge_blocks(to_free);
@@ -47,4 +51,5 @@ void free(void *ptr)
 	to_free->is_free = TRUE;
 	if (!to_free->next)
 		free_out_of_page(to_free, get_heap_head());
+	pthread_mutex_unlock(&g_malloc_lock);
 }

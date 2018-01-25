@@ -9,7 +9,7 @@
 
 void *calloc(size_t nmemb, size_t size)
 {
-	char	*ptr = malloc(nmemb * size);
+	char *ptr = malloc(nmemb * size);
 
 	if (!ptr)
 		return (ptr);

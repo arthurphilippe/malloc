@@ -17,7 +17,8 @@ SRCS		=	src/my_malloc.c		\
 			src/my_free.c		\
 			src/blocks.c		\
 			src/realloc.c		\
-			src/calloc.c
+			src/calloc.c		\
+			src/show_alloc_mem.c
 
 SRCS_TEST	=	tests/main.c
 

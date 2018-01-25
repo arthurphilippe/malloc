@@ -7,15 +7,15 @@
 
 #include "my_malloc.h"
 #include "alignment.h"
+#include "pthread_lock.h"
+
+pthread_mutex_t g_malloc_lock;
 
 /*
 ** Keeps track of the heap's head and allocates it on first call.
 ** returns :
 ** 	on success: the heap's head;
 ** 	on failure: (void *) -1.
-**
-** 	TODO: upon heap creation, use getpagesize
-**
 */
 void *get_heap_head()
 {
@@ -27,7 +27,8 @@ void *get_heap_head()
 			return (head);
 		head->previous = NULL;
 		head->next = NULL;
-		head->size = getpagesize() - sizeof(mblock_t);
+		head->size = ((size_t) sbrk(0) - (size_t) head)
+				- sizeof(mblock_t);
 		head->is_free = TRUE;
 		head->contents = head + 1;
 	}
@@ -112,10 +113,13 @@ void *malloc(size_t size)
 	if (!size || find_free_block(size + sizeof(ALIGNMENT),
 			&previous, &available) != 0)
 		return (NULL);
+	pthread_mutex_lock(&g_malloc_lock);
 	if (!available) {
 		available = push_back_pagebrk(previous, aligned_size);
-		if (available == NULL)
+		if (available == NULL) {
+			pthread_mutex_unlock(&g_malloc_lock);
 			return (NULL);
+		}
 		// write(2, " --> alocated a block\n", 23);
 	}
 	if (aligned_size + sizeof(ALIGNMENT) < available->size) {
@@ -123,5 +127,6 @@ void *malloc(size_t size)
 		// write(2, " --> found an empty block\n", 27);
 	}
 	available->is_free = FALSE;
+	pthread_mutex_unlock(&g_malloc_lock);
 	return (available->contents);
 }
