@@ -23,8 +23,10 @@ void *get_heap_head()
 
 	if (!head) {
 		head = sbrk(getpagesize());
-		if (head == (void *) -1)
+		if (head == (void *) -1) {
+			write(2, "NOOOOOOOOOOOOOOO\n", 18);
 			return (head);
+		}
 		head->previous = NULL;
 		head->next = NULL;
 		head->size = ((size_t) sbrk(0) - (size_t) head)
@@ -89,8 +91,10 @@ static void *push_back_pagebrk(mblock_t *previous, size_t size)
 	size_t size_to_alloc = get_pages_to_alloc(previous, size);
 
 	available = sbrk(size_to_alloc);
-	if (available == (void *) - 1)
+	if (available == (void *) - 1) {
+		write(2, "NAYYYYYY\n", 10);
 		return (NULL);
+	}
 	available->previous = previous;
 	available->next = NULL;
 	available->size = size_to_alloc - sizeof(mblock_t);

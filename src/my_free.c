@@ -19,10 +19,11 @@ static void free_out_of_page(mblock_t *to_free, mblock_t *heap)
 	size_t current_page_pos = (((size_t) to_free - (size_t) heap) + 1) * page_size;
 	size_t diff;
 
-	if ((to_free->size + ((size_t) to_free) - (size_t) heap) > page_size) {
+	if ((to_free->size + ((size_t) to_free->contents)
+		- (size_t) heap) > page_size) {
 		if (to_free->previous)
 			to_free->previous->next = NULL;
-		diff = (size_t) ((to_free + to_free->size) - heap)
+		diff = (((size_t) to_free->contents + to_free->size) - (size_t) heap)
 			- current_page_pos;
 		to_free->size = (size_t) to_free->size - diff;
 		sbrk(-diff);

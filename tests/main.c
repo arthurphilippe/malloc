@@ -14,7 +14,7 @@ void free(void *ptr);
 
 int main(void)
 {
-	show_alloc_mem();
+	show_all_alloc_mem();
 	write(1, "\n", 1);
 	write(1, "\n", 1);
 
@@ -73,7 +73,7 @@ int main(void)
 	char *foo1 = malloc(1120003);
 	char *foo2 = malloc(11200);
 	char *foo3 = calloc(11207650, 1);
-	show_alloc_mem();
+	show_all_alloc_mem();
 	free(foo1);
 	free(foo3);
 	free(foo2);
@@ -113,6 +113,6 @@ int main(void)
 
 	kappa = calloc(12, 1);
 	free(kappa);
-	show_alloc_mem();
+	show_all_alloc_mem();
 
 }
