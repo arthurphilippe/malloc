@@ -16,20 +16,10 @@ pthread_mutex_t g_malloc_lock;
 static void free_out_of_page(mblock_t *to_free, mblock_t *heap)
 {
 	size_t page_size = getpagesize();
-	size_t current_page_pos = (((size_t) to_free - (size_t) heap) + 1) * page_size;
-	size_t diff;
-
-	if ((to_free->size + ((size_t) to_free->contents)
-		- (size_t) heap) > page_size) {
-		if (to_free->previous)
-			to_free->previous->next = NULL;
-		diff = (((size_t) to_free->contents + to_free->size) - (size_t) heap)
-			- current_page_pos;
-		to_free->size = (size_t) to_free->size - diff;
-		if (to_free->size == 4094) {
-			to_free->size = to_free->size;
-		}
-		sbrk(-(diff));
+	if (to_free->size + (((size_t) to_free - (size_t) heap) % page_size)
+		> page_size) {
+		sbrk(-(to_free->size / page_size) * page_size);
+		to_free->size -= (to_free->size / page_size) * page_size;
 	}
 }
 
