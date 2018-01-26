@@ -26,6 +26,9 @@ static void free_out_of_page(mblock_t *to_free, mblock_t *heap)
 		diff = (((size_t) to_free->contents + to_free->size) - (size_t) heap)
 			- current_page_pos;
 		to_free->size = (size_t) to_free->size - diff;
+		if (to_free->size == 4094) {
+			to_free->size = to_free->size;
+		}
 		sbrk(-(diff));
 	}
 }

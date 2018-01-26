@@ -72,7 +72,7 @@ inline static size_t get_pages_to_alloc(mblock_t *previous, size_t size)
 	pages_requiered = zeroed_prev + size;
 	pages_requiered /= page_size;
 	pages_requiered += 1;
-	pages_allocated = (zeroed_prev / page_size); // <-- + 1 or not + 1 ?
+	pages_allocated = (zeroed_prev / page_size) + 1; // <-- + 1 or not + 1 ?
 	// if (previous)
 	return ((pages_requiered - pages_allocated) * page_size);
 	// return (page_size * pages_requiered);
@@ -92,8 +92,8 @@ static void *push_back_pagebrk(mblock_t *previous, size_t size)
 	mblock_t *available;
 	size_t size_to_alloc = get_pages_to_alloc(previous, size);
 
-	available = sbrk(size_to_alloc);
-	if (available == (void *) - 1) {
+	available = (size_to_alloc) ? sbrk(size_to_alloc) : (void *) -1;
+	if (available == (void *) -1) {
 		write(2, "NAYYYYYY\n", 10);
 		return (NULL);
 	}
