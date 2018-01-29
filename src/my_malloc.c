@@ -66,9 +66,13 @@ inline static int find_free_block(size_t size, mblock_t **previous, mblock_t **a
 */
 inline static size_t get_pages_to_alloc(mblock_t *last, size_t size)
 {
-	size_t size_deficit = size - last->size;
+	size_t size_deficit;
 	size_t page_size = getpagesize();
 
+	if (last->is_free == FALSE)
+		size_deficit = size;
+	else
+		size_deficit = size - last->size;
 	size_deficit = (size_deficit / page_size) + 1;
 	return (size_deficit * page_size);
 }
@@ -89,7 +93,13 @@ static void *push_back_pagebrk(mblock_t *previous, size_t size)
 
 	available = (size_to_alloc) ? sbrk(size_to_alloc) : (void *) -1;
 	if (available == (void *) -1) {
-		write(2, "NAYYYYYY\n", 10);
+		if (size_to_alloc)
+			write(2, "NAYYYYYY\n", 10);
+		else {
+			write(2, "kappa :(\n", 10);
+			show_all_alloc_mem();
+			dprintf(2, "was trying to get %d\n", size);
+		}
 		return (NULL);
 	}
 	available->previous = previous;
@@ -115,7 +125,7 @@ void *malloc(size_t size)
 	size_t		aligned_size = align_size(size + sizeof(mblock_t));
 
 	// write(2, "malloc was called\n", 19);
-	if (!size || find_free_block(size + sizeof(ALIGNMENT),
+	if (!size || find_free_block(size + ALIGNMENT,
 			&previous, &available) != 0)
 		return (NULL);
 	pthread_mutex_lock(&g_malloc_lock);

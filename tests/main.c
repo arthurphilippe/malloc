@@ -14,6 +14,37 @@ void free(void *ptr);
 void show_alloc_mem(void);
 void show_all_alloc_mem(void);
 
+void molest_malloc(void)
+{
+	char **molestor = malloc(sizeof(char *) * 101);
+	size_t i = 0;
+
+	while (i < 50) {
+		molestor[i] = malloc(96777773);
+		++i;
+	}
+	while (i < 101) {
+		molestor[i] = malloc(7774373);
+		++i;
+	}
+	show_all_alloc_mem();
+	molestor = realloc(molestor, sizeof(char *) * 68765);
+
+	while (i < 68765) {
+		molestor[i] = malloc(64);
+		++i;
+	}
+	i -= 1;
+
+	while (i > 0) {
+		free(molestor[i]);
+		--i;
+	}
+	free(molestor[i]);
+	free(molestor);
+	show_all_alloc_mem();
+}
+
 int main(void)
 {
 	show_all_alloc_mem();
@@ -24,7 +55,9 @@ int main(void)
 	show_all_alloc_mem();
 	free(kappa);
 	show_all_alloc_mem();
-	return (0);
+	// return (0);
+
+	kappa = malloc(8);
 
 	kappa[0] = '1';
 	kappa[2] = '3';
@@ -68,8 +101,9 @@ int main(void)
 	}
 
 	free(badabou);
-	free(bsartek);
+	// free(bsartek);
 	bsartek = realloc(bsartek, 1120000);
+	free(bsartek);
 	bsartek = malloc(1120000);
 	char *foo1 = realloc(NULL, 1120003);
 	char *foo2 = malloc(11200);
@@ -88,18 +122,22 @@ int main(void)
 
 	free(bsartek);
 
-	kappa = malloc(8);
+	kappa = malloc(2);
 
+	write(1, "\n", 1);
+	write(1, "\n", 1);
 
 	kappa[0] = '1';
-	kappa[2] = '3';
 	kappa[1] = '2';
+	kappa = realloc(kappa, 8);
+	kappa[2] = '3';
 	kappa[3] = '4';
 	kappa[4] = '5';
 	kappa[5] = '6';
 	kappa[6] = '7';
 	kappa[7] = 0;
 	write(1, kappa, 8);
+	write(1, "\n", 1);
 	write(1, "\n", 1);
 	kappa = realloc(kappa, 3);
 	write(1, "\n", 1);
@@ -110,9 +148,10 @@ int main(void)
 	kappa[2] = '3';
 	kappa[1] = '2';
 	write(1, kappa, 3);
-	free(kappa);
+	realloc(kappa, 0);
 
 	kappa = calloc(12, 1);
 	free(kappa);
 	show_all_alloc_mem();
+	molest_malloc();
 }

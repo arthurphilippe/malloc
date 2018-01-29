@@ -9,11 +9,14 @@
 
 void *realloc(void *ptr, size_t size)
 {
-	char		*n_ptr;
+	char		*n_ptr = NULL;
 	mblock_t	*old;
 	char		*old_arr;
 
-	n_ptr = malloc(size);
+	if (!size)
+		free(ptr);
+	else
+		n_ptr = malloc(size);
 	if (!n_ptr)
 		return (NULL);
 	if (!ptr)

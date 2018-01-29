@@ -11,9 +11,9 @@
 void show_block(mblock_t *to_show, enum boolean all)
 {
 	if (to_show->is_free == TRUE)
-		dprintf(1, "* ");
+		dprintf(1, "F ");
 	else if (all == TRUE)
-		dprintf(1, "  ");
+		dprintf(1, "A ");
 	dprintf(1, "%p - %p : %lu bytes\n",
 		to_show->contents,
 		(void *) to_show->contents + to_show->size,

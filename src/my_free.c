@@ -30,10 +30,8 @@ void free(void *ptr)
 {
 	mblock_t *to_free;
 
-	if (!ptr || get_heap_head() == (void *) -1 || ptr < get_heap_head()) {
-		// write(2, "no heap or ptr under heap\n", 27);
+	if (!ptr || get_heap_head() == (void *) -1 || ptr < get_heap_head())
 		return;
-	}
 	pthread_mutex_lock(&g_malloc_lock);
 	to_free = (mblock_t *) ptr - 1;
 	if (to_free->is_free == TRUE) {
