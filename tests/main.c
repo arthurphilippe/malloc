@@ -43,6 +43,26 @@ void molest_malloc(void)
 	free(molestor[i]);
 	free(molestor);
 	show_all_alloc_mem();
+
+	char **str = malloc(sizeof(char *) * 2345);
+	for (int idx = 0; idx < 2345; ++idx)
+		str[idx] = malloc(sizeof(char) * 1004);
+	show_all_alloc_mem();
+	for (int idx = 0; idx < 2345; ++idx)
+		free(str[idx]);
+	free(str);
+	show_all_alloc_mem();
+	str = malloc(sizeof(char *) * 2345);
+	for (int i = 0; i < 2345; ++i)
+		str[i] = malloc(sizeof(char) * 123445);
+	for (int i = 0; i < 2345; ++i)
+		for (int z = 0; z < 123445; ++z)
+			str[i][z] = 'a';
+	for (int i = 0; i < 2345; ++i)
+		str[i][123444] = '\0';
+	for (int i = 0; i < 2345; ++i)
+		printf("%s\n", str[i]);
+
 }
 
 int main(void)

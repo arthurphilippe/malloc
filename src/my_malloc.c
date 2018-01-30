@@ -126,7 +126,6 @@ void *malloc(size_t size)
 	mblock_t	*available = NULL;
 	size_t		aligned_size = align_size(size + sizeof(mblock_t));
 
-	// write(2, "malloc was called\n", 19);
 	if (!size || find_free_block(size + ALIGNMENT,
 			&previous, &available) != 0)
 		return (NULL);
