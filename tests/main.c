@@ -8,6 +8,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <time.h>
+#include <stdlib.h>
 
 void *malloc(size_t size);
 void free(void *ptr);
@@ -31,7 +33,7 @@ void molest_malloc(void)
 	molestor = realloc(molestor, sizeof(char *) * 68765);
 
 	while (i < 68765) {
-		molestor[i] = malloc(64);
+		molestor[i] = malloc((rand() % 64) + 1);
 		++i;
 	}
 	i -= 1;
@@ -46,7 +48,7 @@ void molest_malloc(void)
 
 	char **str = malloc(sizeof(char *) * 2345);
 	for (int idx = 0; idx < 2345; ++idx)
-		str[idx] = malloc(sizeof(char) * 1004);
+		str[idx] = malloc((rand() % 1004) + 1);
 	show_all_alloc_mem();
 	for (int idx = 0; idx < 2345; ++idx)
 		free(str[idx]);
@@ -67,6 +69,8 @@ void molest_malloc(void)
 
 int main(void)
 {
+
+	srand(time(NULL));
 	show_all_alloc_mem();
 	write(1, "\n", 1);
 	write(1, "\n", 1);
