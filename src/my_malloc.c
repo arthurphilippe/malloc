@@ -23,10 +23,8 @@ void *get_heap_head()
 
 	if (!head) {
 		head = sbrk(getpagesize());
-		if (head == (void *) -1) {
-			write(2, "NOOOOOOOOOOOOOOO\n", 18);
+		if (head == (void *) -1)
 			return (head);
-		}
 		head->previous = NULL;
 		head->next = NULL;
 		head->size = ((size_t) sbrk(0) - (size_t) head)
@@ -94,16 +92,8 @@ static void *push_back_pagebrk(mblock_t *previous, size_t size)
 	size_t size_to_alloc = get_pages_to_alloc(previous, size);
 
 	available = (size_to_alloc) ? sbrk(size_to_alloc) : (void *) -1;
-	if (available == (void *) -1) {
-		if (size_to_alloc)
-			write(2, "NAYYYYYY\n", 10);
-		else {
-			write(2, "kappa :(\n", 10);
-			show_all_alloc_mem();
-			dprintf(2, "was trying to get %d\n", size);
-		}
+	if (available == (void *) -1)
 		return (NULL);
-	}
 	available->previous = previous;
 	available->next = NULL;
 	available->size = size_to_alloc - sizeof(mblock_t);
@@ -126,22 +116,21 @@ void *malloc(size_t size)
 	mblock_t	*available = NULL;
 	size_t		aligned_size = align_size(size + sizeof(mblock_t));
 
-	if (!size || find_free_block(size + ALIGNMENT,
-			&previous, &available) != 0)
-		return (NULL);
 	pthread_mutex_lock(&g_malloc_lock);
+	if (!size || find_free_block(size + ALIGNMENT,
+			&previous, &available) != 0) {
+		pthread_mutex_unlock(&g_malloc_lock);
+		return (NULL);
+	}
 	if (!available) {
 		available = push_back_pagebrk(previous, aligned_size);
 		if (available == NULL) {
 			pthread_mutex_unlock(&g_malloc_lock);
 			return (NULL);
 		}
-		// write(2, " --> alocated a block\n", 23);
 	}
-	if (aligned_size + sizeof(ALIGNMENT) < available->size) {
+	if (aligned_size + sizeof(ALIGNMENT) < available->size)
 		split_block(available, aligned_size);
-		// write(2, " --> found an empty block\n", 27);
-	}
 	available->is_free = FALSE;
 	pthread_mutex_unlock(&g_malloc_lock);
 	return (available->contents);
