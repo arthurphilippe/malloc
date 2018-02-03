@@ -51,8 +51,11 @@ inline static int find_free_block(size_t size,
 {
 	mblock_t *head = get_heap_head();
 
-	if (head == (void *) -1)
+	pthread_mutex_lock(&g_malloc_lock);
+	if (head == (void *) -1) {
+		pthread_mutex_unlock(&g_malloc_lock);
 		return (-1);
+	}
 	while (head && (!head->is_free || head->size < size)) {
 		*previous = head;
 		head = head->next;
@@ -69,6 +72,8 @@ inline static size_t get_pages_to_alloc(mblock_t *last, size_t size)
 	size_t size_deficit;
 	size_t page_size = getpagesize();
 
+	if (!last)
+		return (0);
 	if (last->is_free == FALSE)
 		size_deficit = size;
 	else
@@ -116,12 +121,9 @@ void *malloc(size_t size)
 	mblock_t	*available = NULL;
 	size_t		aligned_size = align_size(size + sizeof(mblock_t));
 
-	pthread_mutex_lock(&g_malloc_lock);
 	if (!size || find_free_block(size + ALIGNMENT,
-			&previous, &available) != 0) {
-		pthread_mutex_unlock(&g_malloc_lock);
+			&previous, &available) != 0)
 		return (NULL);
-	}
 	if (!available) {
 		available = push_back_pagebrk(previous, aligned_size);
 		if (available == NULL) {
