@@ -10,15 +10,15 @@
 void *realloc(void *ptr, size_t size)
 {
 	char		*n_ptr = NULL;
-	mblock_t	*old;
+	mblock_t	*old = (mblock_t *) ptr - 1;
 	char		*old_arr;
 
 	if (!size)
 		free(ptr);
-	else
+	else if (!ptr || old->size < size)
 		n_ptr = malloc(size);
 	if (!n_ptr)
-		return (NULL);
+		return (ptr);
 	if (!ptr)
 		return (n_ptr);
 	old = (mblock_t *) ptr - 1;
