@@ -21,7 +21,7 @@ void *realloc(void *ptr, size_t size)
 		return (NULL);
 	if (!ptr)
 		return (n_ptr);
-	old = (mblock_t *) ((void *) ptr - 1);
+	old = (mblock_t *) ptr - 1;
 	old_arr = ptr;
 	for (size_t i = 0; i < old->size && i < size ; ++i)
 		n_ptr[i] = (char) old_arr[i];
