@@ -15,7 +15,7 @@ const size_t ALIGNMENT = sizeof(void *);
 /*
 ** Returns an memory aligned size.
 */
-inline static size_t align_size(size_t size)
+static inline size_t align_size(size_t size)
 {
 	return ((size + ALIGNMENT - 1) & ~(ALIGNMENT - 1));
 }

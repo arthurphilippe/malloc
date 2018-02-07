@@ -17,7 +17,7 @@ pthread_mutex_t g_malloc_lock;
 ** 	on success: the heap's head;
 ** 	on failure: (void *) -1.
 */
-void *get_heap_head()
+void *get_heap_head(void)
 {
 	static mblock_t *head = NULL;
 
