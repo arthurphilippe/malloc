@@ -15,13 +15,15 @@ enum boolean {
 	TRUE = 1
 };
 
-typedef struct		s_mblock {
+struct			s_mblock {
 	struct s_mblock	*previous;
 	struct s_mblock	*next;
 	size_t		size;
 	enum boolean	is_free;
 	void		*contents;
-}			mblock_t;
+};
+
+typedef struct s_mblock mblock_t;
 
 void *malloc(size_t);
 void free(void *ptr);
