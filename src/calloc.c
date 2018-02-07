@@ -13,7 +13,7 @@ void *calloc(size_t nmemb, size_t size)
 
 	if (!ptr)
 		return (ptr);
-	for (size_t i = 0; i < (nmemb * size) ; ++i)
+	for (size_t i = 0; i < (nmemb * size) ; i += 1)
 		ptr[i] = 0;
 	return (ptr);
 }

@@ -20,5 +20,4 @@ inline static size_t align_size(size_t size)
 	return ((size + ALIGNMENT - 1) & ~(ALIGNMENT - 1));
 }
 
-
 #endif /* !ALIGNMENT_H_ */

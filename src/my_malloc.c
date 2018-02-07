@@ -19,7 +19,7 @@ pthread_mutex_t g_malloc_lock;
 */
 void *get_heap_head()
 {
-	static mblock_t	*head = NULL;
+	static mblock_t *head = NULL;
 
 	if (!head) {
 		head = sbrk(getpagesize());
@@ -117,12 +117,11 @@ static void *push_back_pagebrk(mblock_t *previous, size_t size)
 */
 void *malloc(size_t size)
 {
-	mblock_t	*previous = NULL;
-	mblock_t	*available = NULL;
-	size_t		aligned_size = align_size(size + sizeof(mblock_t));
+	mblock_t *previous = NULL;
+	mblock_t *available = NULL;
+	size_t aligned_size = align_size(size + sizeof(mblock_t));
 
-	if (!size || find_free_block(size,
-			&previous, &available) != 0)
+	if (!size || find_free_block(size, &previous, &available) != 0)
 		return (NULL);
 	if (!available) {
 		available = push_back_pagebrk(previous, aligned_size);

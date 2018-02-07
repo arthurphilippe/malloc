@@ -23,7 +23,7 @@ void *realloc(void *ptr, size_t size)
 		return (n_ptr);
 	old = (mblock_t *) ptr - 1;
 	old_arr = ptr;
-	for (size_t i = 0; i < old->size && i < size ; ++i)
+	for (size_t i = 0; i < old->size && i < size ; i += 1)
 		n_ptr[i] = (char) old_arr[i];
 	free(ptr);
 	return (n_ptr);
