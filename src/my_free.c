@@ -24,6 +24,19 @@ static void free_out_of_page(mblock_t *to_free, mblock_t *heap)
 }
 
 /*
+** Takes a starting block and merges it with sourrounding ones.
+*/
+void merge_free_blocks(mblock_t **to_free)
+{
+	if ((*to_free)->next != NULL && (*to_free)->next->is_free == TRUE)
+		merge_blocks(*to_free);
+	if ((*to_free)->previous && (*to_free)->previous->is_free == TRUE) {
+		*to_free = (*to_free)->previous;
+		merge_blocks(*to_free);
+	}
+}
+
+/*
 ** The almight free function.
 */
 void free(void *ptr)
@@ -37,12 +50,7 @@ void free(void *ptr)
 	if (to_free->is_free == TRUE) {
 		return;
 	}
-	if (to_free->next != NULL && to_free->next->is_free == TRUE)
-		merge_blocks(to_free);
-	if (to_free->previous && to_free->previous->is_free == TRUE) {
-		to_free = to_free->previous;
-		merge_blocks(to_free);
-	}
+	merge_free_blocks(&to_free);
 	to_free->is_free = TRUE;
 	if (!to_free->next)
 		free_out_of_page(to_free, get_heap_head());
