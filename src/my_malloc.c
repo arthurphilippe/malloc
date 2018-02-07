@@ -45,9 +45,8 @@ void *get_heap_head()
 ** 		the address of the soon-to-be found free block;
 ** returns on error: -1 (otherwise 0)
 */
-inline static int find_free_block(size_t size,
-				mblock_t **previous,
-				mblock_t **available)
+inline static int find_free_block(size_t size, mblock_t **previous,
+					mblock_t **available)
 {
 	mblock_t *head = get_heap_head();
 
