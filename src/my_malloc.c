@@ -45,7 +45,7 @@ void *get_heap_head(void)
 ** 		the address of the soon-to-be found free block;
 ** returns on error: -1 (otherwise 0)
 */
-inline static int find_free_block(size_t size, mblock_t **previous,
+static int find_free_block(size_t size, mblock_t **previous,
 					mblock_t **available)
 {
 	mblock_t *head = get_heap_head();
@@ -66,7 +66,7 @@ inline static int find_free_block(size_t size, mblock_t **previous,
 /*
 ** Computes the paged alligned size to allocate.
 */
-inline static size_t get_pages_to_alloc(mblock_t *last, size_t size)
+static size_t get_pages_to_alloc(mblock_t *last, size_t size)
 {
 	size_t size_deficit;
 	size_t page_size = getpagesize();
