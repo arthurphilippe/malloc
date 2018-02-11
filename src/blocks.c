@@ -35,7 +35,7 @@ void split_block(mblock_t *to_split, size_t size)
 ** Takes:
 ** 	- a pointer to the first block of the two being merged.
 ** Uses:
-** 	- merge to blocks that are free in order to facilitate re-allocation
+** 	- merge two blocks that are free in order to facilitate re-allocation
 ** 		or memory release.
 */
 void merge_blocks(mblock_t *to_merge)
